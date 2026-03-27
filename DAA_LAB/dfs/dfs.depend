@@ -1,0 +1,5 @@
+# depslib dependency file v1.0
+1774631926 source:c:\users\kishan\desktop\sem-iv-lab-programs\daa_lab\dfs\main.c
+	<stdio.h>
+	<stdlib.h>
+
