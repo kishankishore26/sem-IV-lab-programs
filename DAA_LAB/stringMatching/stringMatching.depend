@@ -1,0 +1,6 @@
+# depslib dependency file v1.0
+1774621464 source:c:\users\kishan\desktop\daa\stringmatching\main.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+
