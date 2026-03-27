@@ -1,7 +1,7 @@
 #include<stdio.h>
 #include<stdlib.h>
 
-void bfs(int a[],int n);
+void bubbleSort(int a[],int n);
 
 int main(){
     int n,a[10];
@@ -11,11 +11,11 @@ int main(){
     for(int i=0;i<n;i++){
         scanf("%d",&a[i]);
     }
-    bfs(a,n);
+    bubbleSort(a,n);
     return 0;
 }
 
-void bfs(int a[],int n){
+void bubbleSort(int a[],int n){
     int i,j;
     for(i=0;i<n-1;i++){
         for(j=0;j<n-i-1;j++){
