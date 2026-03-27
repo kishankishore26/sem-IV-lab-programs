@@ -1,0 +1,5 @@
+READCHAR MACRO
+        MOV AH,01H
+        INT 21H
+ENDM
+
