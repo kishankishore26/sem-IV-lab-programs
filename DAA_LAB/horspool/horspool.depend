@@ -1,0 +1,5 @@
+# depslib dependency file v1.0
+1776020257 source:c:\users\kishan\desktop\daa\horspool\main.c
+	<stdio.h>
+	<string.h>
+
