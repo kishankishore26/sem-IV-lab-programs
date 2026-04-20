@@ -1,103 +1,74 @@
 DATA SEGMENT
-STR     DB 50 DUP(?)
-REV     DB 50 DUP(?)
-N       DB ?
-MSG1    DB 0DH,0AH,'Enter a string: $'
-MSG2    DB 0DH,0AH,'String is Palindrome $'
-MSG3    DB 0DH,0AH,'String is not Palindrome $'
+    str1 DB 20 DUP(?)
+    str2 DB 20 DUP(?)
+    n DB ?
+    M1 DB 10, 13, 'ENTER THE STRING: $'
+    M2 DB 10, 13, 'STRING IS PALINDROME $'
+    M3 DB 10, 13, 'STRING IS NOT PALINDROME$'
 DATA ENDS
 
 CODE SEGMENT
-ASSUME CS:CODE, DS:DATA
-
+ASSUME CS: CODE, DS: DATA
 START:
     MOV AX, DATA
     MOV DS, AX
-
-    ; Display message
+    LEA SI, str1
+    LEA DI, str2
+    LEA DX, M1
     MOV AH, 09H
-    LEA DX, MSG1
     INT 21H
-
-    ; Read string
-    LEA SI, STR
     CALL READSTRING
-
-    ; Length of string in CL
-    MOV N, CL
-
-    ; Reverse string
-    DEC SI              ; Point to last character
-    LEA DI, REV
-    MOV CH, 00
-    MOV CL, N
-
-REVERSE:
-    CMP CL, 0
+    MOV n, CL
+    MOV CL, 00H
+    DEC SI
+UP1:
+    CMP CL, n
     JZ CHECK
-
     MOV AL, [SI]
     MOV [DI], AL
     DEC SI
+    INC CL
     INC DI
-    DEC CL
-    JMP REVERSE
-
+    JMP UP1
 CHECK:
-    LEA SI, STR
-    LEA DI, REV
-    MOV CL, N
-    SHR CL, 1           ; Compare half length
-
-COMPARE:
-    CMP CL, 0
-    JZ EQUAL
-
+    LEA SI, str1
+    LEA DI, str2
+    MOV CL, 00H
+UP2:
+    CMP CL, n
+    JZ PAL
     MOV AL, [SI]
-    MOV BL, [DI]
-    CMP AL, BL
-    JNE NOTEQUAL
-
+    CMP AL, [DI]
+    JNZ NOTPAL
     INC SI
     INC DI
-    DEC CL
-    JMP COMPARE
-
-EQUAL:
+    INC CL
+    JMP UP2
+NOTPAL:
+    LEA DX, M3
     MOV AH, 09H
-    LEA DX, MSG2
     INT 21H
     JMP EXIT
-
-NOTEQUAL:
+PAL:
+    LEA DX, M2
     MOV AH, 09H
-    LEA DX, MSG3
     INT 21H
-
 EXIT:
     MOV AH, 4CH
     INT 21H
-
-; -------------------------
-; READSTRING PROCEDURE
-; -------------------------
-READSTRING PROC
-    MOV CL, 0
-
-READ:
+    READSTRING PROC NEAR
+    MOV CL, 00H
+UP:
     MOV AH, 01H
     INT 21H
-    CMP AL, 0DH         ; Enter key?
-    JE DONE
-
+    CMP AL, 0DH
+    JZ DONE
     MOV [SI], AL
     INC SI
     INC CL
-    JMP READ
-
+    JMP UP
 DONE:
     RET
-READSTRING ENDP
-
+    READSTRING ENDP
 CODE ENDS
-END START
+    END START
