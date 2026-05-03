@@ -1,5 +1,4 @@
- 
---Consider the following relations for an order processing database application in a company: 
+ --Consider the following relations for an order processing database application in a company: 
  
 --CUSTOMER (cust #: int, cname: string, city: string) 
 --ORDER (order #: int, odate: date, cust #: int, ord-Amt: int) 
@@ -11,48 +10,124 @@
 --2. For each item that has more than two orders , list the item, number of orders that are  shipped from atleast two warehouses and total  quantity of items shipped 
 --3. List the customers who have ordered for every item that the company produces 
 
-CREATE DATABASE ORDER_ORDER
+CREATE DATABASE ORDER_ORDER;
 
-USE ORDER_ORDER
+USE ORDER_ORDER;
 
 --CUSTOMER (cust #: int, cname: string, city: string) 
-
 CREATE TABLE CUSTOMER(
-	CUSTID INT,
-	CNAME VARCHAR(20),
-	CITY VARCHAR(10),
-	PRIMARY KEY(CUSTID)
-)
-insert into CUSTOMER values (111,'John Smith', 'Karkala') 
-insert into CUSTOMER values (112,'Ramesh N', 'Nitte')    
-insert into CUSTOMER values (113,'Franklin', 'Karkala') 
-insert into CUSTOMER values (114,'Alica', 'mangalore') 
-insert into CUSTOMER values (115,'Raju', 'Udupi') 
+    CUSTID INT PRIMARY KEY,
+    CNAME VARCHAR(20),
+    CITY VARCHAR(15)
+);
+
+INSERT INTO CUSTOMER VALUES(111,'John Smith','Karkala')
+INSERT INTO CUSTOMER VALUES(112,'Ramesh N','Nitte')
+INSERT INTO CUSTOMER VALUES(113,'Franklin','Karkala')
+INSERT INTO CUSTOMER VALUES(114,'Alica','Mangalore')
+INSERT INTO CUSTOMER VALUES(115,'Raju','Udupi')
+
 
 --ORDER (order #: int, odate: date, cust #: int, ord-Amt: int) 
-
 CREATE TABLE C_ORDER(
-	ORDERID INT,
-	ODATE DATETIME,
-	CUSTID INT,
-	OAMT INT,
-	PRIMARY KEY(ORDERID),
-	FOREIGN KEY(CUSTID) REFERENCES CUSTOMER(CUSTID) ON DELETE CASCADE ON UPDATE CASCADE
-)
+    ORDERID INT PRIMARY KEY,
+    ODATE DATETIME,
+    CUSTID INT,
+    OAMT INT,
+    FOREIGN KEY(CUSTID) REFERENCES CUSTOMER(CUSTID)
+        ON DELETE CASCADE ON UPDATE CASCADE
+);
 
-insert into C_ORDER values (201,'2001-08-03', 111,null) 
-insert into C_ORDER values (202,'2002-08-03', 111,null) 
-insert into C_ORDER values (203,'2001-08-04', 112,null) 
-insert into C_ORDER values (204,'2004-02-01', 113,null) 
-insert into C_ORDER values (205,'2001-04-02', 114,null) 
-insert into C_ORDER values (206,'2005-02-01', 115,null) 
-insert into C_ORDER values (207,'2008-04-01', 115,null) 
-insert into C_ORDER values (209,'2008-02-01', 114,null) 
-insert into C_ORDER values (208,'2008-12-01', 111,null) 
-insert into C_ORDER values (200,'2008-11-01', 111,null) 
-insert into C_ORDER values (210,'2008-10-01', 111,null) 
+INSERT INTO C_ORDER VALUES(201,'2001-08-03',111,NULL)
+INSERT INTO C_ORDER VALUES(202,'2002-08-03',111,NULL)
+INSERT INTO C_ORDER VALUES(203,'2001-08-04',112,NULL)
+INSERT INTO C_ORDER VALUES(204,'2004-02-01',113,NULL)
+INSERT INTO C_ORDER VALUES(205,'2001-04-02',114,NULL)
+INSERT INTO C_ORDER VALUES(206,'2005-02-01',115,NULL)
+INSERT INTO C_ORDER VALUES(207,'2008-04-01',115,NULL)
+INSERT INTO C_ORDER VALUES(209,'2008-02-01',114,NULL)
+INSERT INTO C_ORDER VALUES(208,'2008-12-01',111,NULL)
+INSERT INTO C_ORDER VALUES(200,'2008-11-01',111,NULL)
+INSERT INTO C_ORDER VALUES(210,'2008-10-01',111,NULL)
 
-SELECT * FROM C_ORDER
+--ITEM (item #: int, unit price: int) 
+CREATE TABLE ITEM(
+    ITEMID INT PRIMARY KEY,
+    PRICE INT
+);
+
+INSERT INTO ITEM VALUES(301,2000)
+INSERT INTO ITEM VALUES(302,2000)
+INSERT INTO ITEM VALUES(303,1000)
+INSERT INTO ITEM VALUES(304,5000)
+INSERT INTO ITEM VALUES(305,4000)
+
+--ORDER – ITEM (order #: int, item #: int, qty: int) 
+CREATE TABLE ORDER_ITEM(
+    ORDERID INT,
+    ITEMID INT,
+    QTY INT,
+    PRIMARY KEY(ORDERID, ITEMID),
+    FOREIGN KEY(ORDERID) REFERENCES C_ORDER(ORDERID)
+        ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY(ITEMID) REFERENCES ITEM(ITEMID)
+        ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+INSERT INTO ORDER_ITEM VALUES(201,301,2)
+INSERT INTO ORDER_ITEM VALUES(201,302,4)
+INSERT INTO ORDER_ITEM VALUES(201,303,4)
+INSERT INTO ORDER_ITEM VALUES(201,304,4)
+INSERT INTO ORDER_ITEM VALUES(201,305,3)
+
+INSERT INTO ORDER_ITEM VALUES(202,303,2)
+INSERT INTO ORDER_ITEM VALUES(202,305,4)
+
+INSERT INTO ORDER_ITEM VALUES(203,302,1)
+INSERT INTO ORDER_ITEM VALUES(204,305,2)
+INSERT INTO ORDER_ITEM VALUES(205,301,3)
+INSERT INTO ORDER_ITEM VALUES(206,301,5)
+
+--WAREHOUSE (warehouse #: int, city: string) 
+CREATE TABLE WAREHOUSE(
+    WAREHOUSEID INT PRIMARY KEY,
+    CITY VARCHAR(15) NOT NULL
+);
+
+INSERT INTO WAREHOUSE VALUES(1,'MANGALORE')
+INSERT INTO WAREHOUSE VALUES(2,'MANGALORE')
+INSERT INTO WAREHOUSE VALUES(3,'MANGALORE')
+INSERT INTO WAREHOUSE VALUES(4,'UDUPI')
+INSERT INTO WAREHOUSE VALUES(5,'UDUPI')
+INSERT INTO WAREHOUSE VALUES(6,'KARKALA')
+
+--SHIPMENT (order #: int, warehouse#: int, ship-date: date) 
+CREATE TABLE SHIPMENT(
+    ORDERID INT,
+    WAREHOUSEID INT,
+    SHIPDATE DATETIME,
+    PRIMARY KEY(ORDERID, WAREHOUSEID),
+    FOREIGN KEY(ORDERID) REFERENCES C_ORDER(ORDERID)
+        ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY(WAREHOUSEID) REFERENCES WAREHOUSE(WAREHOUSEID)
+        ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+INSERT INTO SHIPMENT VALUES(201,1,'2001-04-02')
+INSERT INTO SHIPMENT VALUES(201,2,'2001-04-04')
+
+INSERT INTO SHIPMENT VALUES(202,1,'2001-05-02')
+INSERT INTO SHIPMENT VALUES(202,2,'2002-05-12')
+INSERT INTO SHIPMENT VALUES(202,3,'2003-06-01')
+INSERT INTO SHIPMENT VALUES(202,4,'2003-06-01')
+
+INSERT INTO SHIPMENT VALUES(203,1,'2004-02-01')
+INSERT INTO SHIPMENT VALUES(203,2,'2004-02-01')
+INSERT INTO SHIPMENT VALUES(203,3,'2004-02-01')
+
+INSERT INTO SHIPMENT VALUES(204,4,'2004-06-02')
+INSERT INTO SHIPMENT VALUES(204,2,'2004-06-02')
+
 UPDATE C_ORDER
 SET OAMT = (
     SELECT SUM(OI.QTY * I.PRICE)
@@ -61,107 +136,38 @@ SET OAMT = (
     WHERE OI.ORDERID = C_ORDER.ORDERID
 );
 
---ITEM (item #: int, unit price: int) 
-CREATE TABLE ITEM(
-	ITEMID INT,
-	PRICE INT,
-	PRIMARY KEY(ITEMID)
-) 
-
-insert into ITEM values (301,2000) 
-insert into ITEM values (302,2000) 
-insert into ITEM values (303,1000) 
-insert into ITEM values (304,5000) 
-insert into ITEM values (305,4000)
-
--- ORDER_ITEM (order #: int, item #: int, qty: int) 
-
-CREATE TABLE ORDER_ITEM(
-	ORDERID INT,
-	ITEMID INT,
-	QTY INT,
-	PRIMARY KEY(ITEMID,ORDERID),
-	FOREIGN KEY(ORDERID) REFERENCES C_ORDER(ORDERID) ON DELETE CASCADE ON UPDATE CASCADE,
-	FOREIGN KEY(ITEMID) REFERENCES ITEM(ITEMID) ON DELETE CASCADE ON UPDATE CASCADE
-)
-
-insert into ORDER_ITEM values (201,301,2) 
-insert into ORDER_ITEM values (201,302,4) 
-insert into ORDER_ITEM values (201,303,4) 
-insert into ORDER_ITEM values (201,304,4) 
-insert into ORDER_ITEM values (201,305,3) 
- 
-insert into ORDER_ITEM values (202,303,2) 
-insert into ORDER_ITEM values (202,305,4) 
-insert into ORDER_ITEM values (203,302,1) 
-insert into ORDER_ITEM values (204,305,2) 
-insert into ORDER_ITEM values (205,301,3) 
-insert into ORDER_ITEM values (206,301,5) 
-
---SHIPMENT (order #: int, warehouse#: int, ship-date: date) 
-
-CREATE TABLE SHIPMENT(
-	ORDERID INT,
-	WAREHOUSEID INT,
-	SHIPDATE DATETIME,
-	PRIMARY KEY(ORDERID,WAREHOUSEID),
-	FOREIGN KEY(WAREHOUSEID) REFERENCES WAREHOUSE(WAREHOUSEID) ON DELETE CASCADE ON UPDATE CASCADE,
-	FOREIGN KEY(ORDERID) REFERENCES C_ORDER(ORDERID) ON DELETE CASCADE ON UPDATE CASCADE
-)
-
-insert into SHIPMENT values (201,1,'2001-04-02') 
-insert into SHIPMENT values (201,2,'2001-04-04') 
-insert into SHIPMENT values (202,1,'2001-05-02') 
-insert into SHIPMENT values (202,2,'2002-05-12') 
-insert into SHIPMENT values (202,3,'2003-06-01') 
-insert into SHIPMENT values (202,4,'2003-06-01') 
-insert into SHIPMENT values (203,1,'2004-02-01') 
-insert into SHIPMENT values (203,2,'2004-02-01') 
-insert into SHIPMENT values (203,3,'2004-02-01') 
-insert into SHIPMENT values (204,4,'2004-06-02') 
-insert into SHIPMENT values (204,2,'2004-06-02') 
-
---WAREHOUSE (warehouse #: int, city: string) 
-
-CREATE TABLE WAREHOUSE(
-	WAREHOUSEID INT,
-	CITY VARCHAR(10) NOT NULL,
-	PRIMARY KEY(WAREHOUSEID)
-)
-
-insert into WAREHOUSE values (1,'MAGALORE') 
-insert into WAREHOUSE values (2,'MAGALORE') 
-insert into WAREHOUSE values (3,'MAGALORE') 
-insert into WAREHOUSE values (4,'UDUPI') 
-insert into WAREHOUSE values (5,'UDUPI') 
-insert into WAREHOUSE values (6,'KARKALA') 
-
 --1. Produce a listing: CUSTNAME, #oforders, AVG_ORDER_AMT, where the middle column is the total numbers of orders by the customer and the last column is the average order amount for that customer.
-
-SELECT C.CNAME,COUNT(O.ORDERID) AS NO_OF_ORDERS,AVG(O.OAMT) AS AVG_AMT
-FROM CUSTOMER C,C_ORDER O
-WHERE C.CUSTID=O.CUSTID GROUP BY C.CNAME,C.CUSTID
+select 
+	C.CNAME,
+	count(O.ORDERID) as no_of_orders,
+	avg(O.OAMT) as avg_qty
+from CUSTOMER C
+join C_ORDER O on C.CUSTID=O.CUSTID
+group by C.CNAME,C.CUSTID
 
 --2. For each item that has more than two orders , list the item, number of orders that are  shipped from atleast two warehouses and total  quantity of items shipped 
+select 
+	ITEMID,
+	count(*) as no_of_orders,
+	sum(QTY) as total_qty
+from (
+	select
+		OI.ORDERID,
+		OI.ITEMID,
+		OI.QTY
+		from ORDER_ITEM OI
+		join SHIPMENT S on OI.ORDERID=S.ORDERID
+		group by OI.ITEMID,OI.ORDERID,OI.QTY
+		having count(S.WAREHOUSEID)>=2
+)as temp
+group by ITEMID
+having count(*)>=2
 
-SELECT OI.ITEMID,
-       COUNT(DISTINCT OI.ORDERID) AS NO_OF_ORDERS,
-       SUM(OI.QTY) AS TOTAL_QUANTITY
-FROM ORDER_ITEM OI
-JOIN (
-    SELECT ORDERID
-    FROM SHIPMENT
-    GROUP BY ORDERID
-    HAVING COUNT(DISTINCT WAREHOUSEID) >= 2
-) S ON OI.ORDERID=S.ORDERID
-GROUP BY OI.ITEMID
-HAVING COUNT(DISTINCT OI.ORDERID) > 2;
-
---3. List the customers who have ordered for every item that the company produces 
-
-SELECT C.CNAME
-FROM CUSTOMER C, C_ORDER O, ORDER_ITEM OI
-WHERE C.CUSTID = O.CUSTID
-  AND O.ORDERID = OI.ORDERID
-GROUP BY C.CUSTID, C.CNAME
-HAVING COUNT(DISTINCT OI.ITEMID) = (SELECT COUNT(*) FROM ITEM);
+--3. List the customers who have ordere for every item that the company produces
+select C.CNAME
+from CUSTOMER C
+join C_ORDER O on C.CUSTID=O.CUSTID
+join ORDER_ITEM OI on O.ORDERID=OI.ORDERID
+group by C.CNAME,C.CUSTID
+having count(distinct OI.ITEMID)=(
+select count(*) from ITEM)
